@@ -5,19 +5,12 @@ import os
 # Настройка страницы
 st.set_page_config(page_title="Испанский с Сашей", page_icon="🇪🇸")
 
-# Стилизация
-st.markdown("""
-    <style>
-    .main { background-color: #f5f7f9; }
-    .stButton>button { border-radius: 20px; width: 100%; }
-    </style>
-    """, unsafe_allow_html=True)
-
+# Заголовок
 st.title("Твой старт в испанском")
 st.write("### Привет! Спасибо, что записались на курс!")
 st.info("Попробуйте попрактиковать эти фразы. В Испании редко обращаются друг к другу на 'Вы', так что все фразы тут – на ты.")
 
-# Обновленный список фраз с новыми именами файлов
+# Полный список твоих новых фраз и файлов
 phrases = [
     {"es": "¡Hola! ¿Qué tal?", "ru": "Привет, как дела?", "file": "Hola! Que tal.m4a"},
     {"es": "Bien, ¿y tú?", "ru": "Хорошо, а у тебя?", "file": "Bien, y tu.m4a"},
@@ -36,25 +29,28 @@ phrases = [
     {"es": "¿Hablas inglés?", "ru": "Ты говоришь по-английски?", "file": "Hablas inglés.m4a"}
 ]
 
+# Создание карточек для каждой фразы
 for i, item in enumerate(phrases):
     with st.expander(f"{item['es']} — {item['ru']}"):
-        if os.path.exists(item['file']):
-            col1, col2 = st.columns([1, 1])
-            with col1:
-                st.write("Слушай Сашу:")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write("Слушай Сашу:")
+            if os.path.exists(item['file']):
                 st.audio(item['file'])
-            with col2:
-                st.write("Твоя очередь:")
-                mic_recorder(
-                    start_prompt="Нажми и говори",
-                    stop_prompt="Стоп (закончить)",
-                    key=f"recorder_{i}"
-                )
-        else:
-            st.warning(f"Файл {item['file']} не найден на GitHub. Проверь название!")
+            else:
+                st.warning(f"Файл {item['file']} не найден")
+        with col2:
+            st.write("Твоя очередь:")
+            # Функция записи (появится только если requirements.txt верен)
+            mic_recorder(
+                start_prompt="Нажать и говорить",
+                stop_prompt="Стоп (закончить)",
+                key=f"recorder_{i}"
+            )
 
 st.divider()
 
+# Финальная кнопка
 if st.button("Я прошел все фразы!"):
     st.balloons()
     st.success("### Ого! Поздравляю, похоже, первый барьер вы преодолели! 🎉")
