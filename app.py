@@ -2,15 +2,12 @@ import streamlit as st
 from streamlit_mic_recorder import mic_recorder
 import os
 
-# Настройка страницы
 st.set_page_config(page_title="Испанский с Сашей", page_icon="🇪🇸")
 
-# Заголовок
 st.title("Твой старт в испанском")
 st.write("### Привет! Спасибо, что записались на курс!")
-st.info("Попробуйте попрактиковать эти фразы. В Испании редко обращаются друг к другу на 'Вы', так что все фразы тут – на ты.")
+st.info("Послушайте фразу, а затем запишите свой голос, чтобы сравнить произношение.")
 
-# Полный список твоих новых фраз и файлов
 phrases = [
     {"es": "¡Hola! ¿Qué tal?", "ru": "Привет, как дела?", "file": "Hola! Que tal.m4a"},
     {"es": "Bien, ¿y tú?", "ru": "Хорошо, а у тебя?", "file": "Bien, y tu.m4a"},
@@ -29,28 +26,33 @@ phrases = [
     {"es": "¿Hablas inglés?", "ru": "Ты говоришь по-английски?", "file": "Hablas inglés.m4a"}
 ]
 
-# Создание карточек для каждой фразы
 for i, item in enumerate(phrases):
     with st.expander(f"{item['es']} — {item['ru']}"):
         col1, col2 = st.columns(2)
+        
         with col1:
-            st.write("Слушай Сашу:")
+            st.write("👂 **Слушай Сашу:**")
             if os.path.exists(item['file']):
                 st.audio(item['file'])
             else:
-                st.warning(f"Файл {item['file']} не найден")
+                st.caption(f"⚠️ Файл {item['file']} ожидается...")
+
         with col2:
-            st.write("Твоя очередь:")
-            # Функция записи (появится только если requirements.txt верен)
-            mic_recorder(
-                start_prompt="Нажать и говорить",
-                stop_prompt="Стоп (закончить)",
+            st.write("🎤 **Твоя очередь:**")
+            # Обновленная логика записи
+            audio_data = mic_recorder(
+                start_prompt="Начать запись",
+                stop_prompt="Остановить и сохранить",
                 key=f"recorder_{i}"
             )
+            
+            # Если запись сделана, она СРАЗУ отобразится здесь
+            if audio_data:
+                st.audio(audio_data['bytes'])
+                st.success("Отлично! Сравни своё звучание с оригиналом.")
 
 st.divider()
 
-# Финальная кнопка
 if st.button("Я прошел все фразы!"):
     st.balloons()
     st.success("### Ого! Поздравляю, похоже, первый барьер вы преодолели! 🎉")
